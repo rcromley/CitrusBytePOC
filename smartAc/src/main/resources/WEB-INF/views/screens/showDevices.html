@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Welcome to the Spring MVC Quickstart application! Get started quickly by signing up!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="../../resources/css/bootstrap.min.css" rel="stylesheet" media="screen" th:href="@{/resources/css/bootstrap.min.css}"/>
+    <link href="../../resources/css/core.css" rel="stylesheet" media="screen" th:href="@{/resources/css/core.css}" />
+    <script src="../../resources/js/jquery.min.js" th:src="@{/resources/js/jquery.min.js}"></script>
+    <script src="../../resources/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap.min.js}"></script>
+    <link rel="stylesheet" type="text/css"
+          href="webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script>
+    	function reloadScreen() {
+    	  var searchDevice = document.getElementById('searchDevice').value;
+    	  window.location.href = '/showDevices/?searchDeviceName=' + searchDevice;
+		}
+    </script>
+    <style>
+		table {
+		  font-family: arial, sans-serif;
+		  border-collapse: collapse;
+		  width: 100%;
+		}
+		
+		th {
+		  padding-top: 12px;
+		  padding-bottom: 12px;
+		  text-align: left;
+		  background-color: #4CAF50;
+		  color: white;
+		  padding: 8px;
+		}
+		
+		td {
+		  border: 1px solid #dddddd;
+		  text-align: left;
+		  padding: 8px;
+		}
+		
+		tr:nth-child(even) {
+		  background-color: #dddddd;
+		}
+	</style>
+</head>
+<body>
+<div th:replace="~{views/fragments/header :: header}">Header</div>
+<div th:replace="~{views/fragments/navbar :: navbar}">navbar</div>
+<div class="container">
+    <div class="text-center" sec:authorize="isAuthenticated()">
+    	<div th:unless="${#lists.isEmpty(notificationMessages)}">
+	      <table id="notifications">
+	        <tbody>
+	          <tr th:each="msg : ${notificationMessages}">	   
+	          	<td><a th:href="@{'/notifications/d/' + ${msg.key}}" th:text="'MARK AS MANAGED'" style="color:red;" th:onclick="'reloadScreen();'">managed</a></td>
+	          	<td class="error" style="color:red;" th:text="${{msg.value}}">msg</td>
+	          </tr>
+	        </tbody>
+	      </table>
+		</div>	
+    	<h2>List of Devices</h2>       
+        <div th:unless="${#lists.isEmpty(devicesList)}">
+    	      
+	      <table>
+            <tr>
+                <td>Select Device:</td>
+                <td><input id="searchDevice" type="text" name="searchDevice"/></td>
+                <td><button type="button" th:onclick="'reloadScreen();'">Search</button></td>
+            </tr>
+        </table>
+	      
+	      <table id="customers">
+	        <thead>
+	          <tr>
+	            <th>Serial Number</th>
+	            <th>Firmware Version</th>
+	            <th>Registration Date</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	          <tr th:each="device : ${devicesList}">	   
+	          	<td><a th:href="@{'/showDeviceDetail/' + ${device.id}}" th:text="${{device.deviceSerialNumber}}">device.deviceSerialNumber</a></td>
+		        <td th:text="${{device.firmwareVersion}}">firmware</td>
+		        <td th:text="${{device.registrationDate}}">dt</td>
+	          </tr>
+	        </tbody>
+	      </table>
+	      
+	    </div>
+    </div>
+    <div th:insert="~{views/fragments/footer :: footer}">&copy; 2017 The Static Templates</div>
+</div>
+</body>
+</html>

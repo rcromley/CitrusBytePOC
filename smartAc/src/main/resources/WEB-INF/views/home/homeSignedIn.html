@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Welcome to the Spring MVC Quickstart application! Get started quickly by signing up!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="refresh" content="0; URL=/showDevices">
+    <link href="../../resources/css/bootstrap.min.css" rel="stylesheet" media="screen" th:href="@{/resources/css/bootstrap.min.css}"/>
+    <link href="../../resources/css/core.css" rel="stylesheet" media="screen" th:href="@{/resources/css/core.css}" />
+    <script src="../../resources/js/jquery.min.js" th:src="@{/resources/js/jquery.min.js}"></script>
+    <script src="../../resources/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<div th:replace="~{views/fragments/header :: header}">Header</div>
+<div th:replace="~{views/fragments/navbar :: navbar}">navbar</div>
+<div class="container">
+    <div class="text-center">
+        
+        <h1>Thymeleaf Layouts</h1>
+        
+        <!--<div class="lead" th:insert="https://www.thymeleaf.org :: section.description">
+            Welcome to the Spring MVC Quickstart application!
+            Get started quickly by signing up.
+        </div>-->
+        
+        <p>
+            <a id="signup" class="btn btn-success btn-lg">Sign up</a>
+        </p>
+    </div>
+    <div th:insert="~{views/fragments/footer :: footer}">&copy; 2017 The Static Templates</div>
+</div>
+</body>
+</html>

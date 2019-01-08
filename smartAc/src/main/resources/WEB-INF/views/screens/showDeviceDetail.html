@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Welcome to the Spring MVC Quickstart application! Get started quickly by signing up!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="../../resources/css/bootstrap.min.css" rel="stylesheet" media="screen" th:href="@{/resources/css/bootstrap.min.css}"/>
+    <link href="../../resources/css/core.css" rel="stylesheet" media="screen" th:href="@{/resources/css/core.css}" />
+    <script src="../../resources/js/jquery.min.js" th:src="@{/resources/js/jquery.min.js}"></script>
+    <script src="../../resources/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap.min.js}"></script>
+    <script>
+    	function reloadScreen() {
+    	  var e = document.getElementById("searchDateRange");
+    	  var index = e.selectedIndex;
+		  var searchDateRange = e.options[index].value;
+    	  window.location.href = '/showDeviceDetail/?searchDateRange=' + searchDateRange;
+		}		
+    </script>
+    <style>
+		table {
+		  font-family: arial, sans-serif;
+		  border-collapse: collapse;
+		  width: 100%;
+		}
+		
+		th {
+		  padding-top: 12px;
+		  padding-bottom: 12px;
+		  text-align: left;
+		  background-color: #4CAF50;
+		  color: white;
+		  padding: 8px;
+		}
+		
+		td {
+		  border: 1px solid #dddddd;
+		  text-align: left;
+		  padding: 8px;
+		}
+		
+		tr:nth-child(even) {
+		  background-color: #dddddd;
+		}
+	</style>
+	<script type = "text/javascript" src = "https://www.gstatic.com/charts/loader.js"></script>
+    <script type = "text/javascript">google.charts.load('current', {packages: ['corechart','line']}); </script>
+</head>
+<body>
+<div th:replace="~{views/fragments/header :: header}">Header</div>
+<div th:replace="~{views/fragments/navbar :: navbar}">navbar</div>
+<div class="container" sec:authorize="isAuthenticated()">
+	<div th:unless="${#lists.isEmpty(notificationMessages)}">
+      <table id="notifications">
+        <tbody>
+          <tr th:each="msg : ${notificationMessages}">	   
+          	<td><a th:href="@{'/notifications/dd/' + ${msg.key}}" th:text="'MARK AS MANAGED'" style="color:red;" th:onclick="'reloadScreen();'">managed</a></td>
+          	<td class="error" style="color:red;" th:text="${{msg.value}}">msg</td>
+          </tr>
+        </tbody>
+      </table>
+	</div>	
+	<input id="chartData" type="hidden" name="chartData" th:value="${{chartData}}"/>
+    <div class="text-center">        
+    	<h2>Device</h2>
+        <div th:unless="${#lists.isEmpty(device)}">
+	      
+	      <table>
+	        <thead>
+	          <tr>
+	            <th>Serial Number</th>
+	            <th>Firmware Version</th>
+	            <th>Registration Date</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	          <tr>
+	            <td th:text="${{device.deviceSerialNumber}}">serial number</td>
+	            <td th:text="${{device.firmwareVersion}}">firmware</td>
+	            <td th:text="${{device.registrationDate}}">dt</td>
+	          </tr>
+	        </tbody>
+	      </table>
+	      
+	      <table>
+            <tr>
+                <td>Select Date Range:</td>
+                <td>
+                	<div style="width:200px;">
+					  <select id="searchDateRange">
+					    <option value="">All Dates</option>
+					    <option value="TODAY">Today</option>
+					    <option value="THIS_WEEK">This week</option>
+					    <option value="THIS_MONTH">This month</option>
+					    <option value="THIS_YEAR">This year</option>
+					  </select>
+					</div>
+				</td>
+                <td><button type="button" th:onclick="'reloadScreen();'">Select</button></td>
+            </tr>
+          </table>
+	      
+	    </div>
+	    
+	    <div th:unless="${#lists.isEmpty(sensorDataList)}">
+    
+	      <h2>Sensor Values</h2>
+	      <div id = "container" class="text-center" style = "width: 1100px; height: 400px; margin: 0 auto"></div>
+	      
+	      <table>
+	        <thead>
+	          <tr>
+	            <th>Sensor Type</th>
+	            <th>Sensor Value</th>
+	            <th>Timestamp</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	          <tr th:each="data : ${sensorDataList}">
+	            <td th:text="${{data.sensorType}}">sensorType</td>
+	            <td th:text="${{data.sensorValue}}">sensorValue</td>
+	            <td th:text="${{data.sensorTimestamp}}">sensorTimestamp</td>
+	          </tr>
+	        </tbody>
+	      </table>
+	      
+	    </div>
+    </div> 
+      <script language = "JavaScript">
+         function drawChart() {
+              var dataTable = new google.visualization.DataTable();
+         	  var newData = document.getElementById('chartData').value;
+         	  var columnsAndRows = newData.split(";");
+         	  var columns = columnsAndRows[0].split(",");
+         	  var numCols = columns.length;
+         	  dataTable.addColumn('string', columns[0]);
+         	  for (var i = 1; i < numCols; i++)
+	            dataTable.addColumn('number', columns[i]);  
+         	  var numRows = columnsAndRows.length - 1;
+         	  var rowTmp = columnsAndRows[1].split(",");
+         	  for (var i = 1; i < numRows; i++) {
+         	    var rowTmp = columnsAndRows[i].split(",");
+         	    var row = ["Jan", 1, 2, 3]; 
+         	    row[0] = rowTmp[0];
+         	    row[1] = Number(rowTmp[1]);
+         	    row[2] = Number(rowTmp[2]);
+         	    row[3] = Number(rowTmp[3]);
+         	    dataTable.addRow(row);  
+	          }
+            
+            var options = {'title' : 'Readings from Sensors',
+               hAxis: {
+                  title: 'Day'
+               },
+               vAxis: {
+                  title: 'Value'
+               },   
+               'width':1100,
+               'height':400,
+               curveType: 'function'
+            };
+            var chart = new google.visualization.LineChart(document.getElementById('container'));
+            chart.draw(dataTable, options);
+         }
+         google.charts.setOnLoadCallback(drawChart);
+      </script>
+    <div th:insert="~{views/fragments/footer :: footer}">&copy; 2017 The Static Templates</div>
+</div>
+</body>
+</html>
